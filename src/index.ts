@@ -17,7 +17,7 @@ redisClient.connect();
 
 const app = express();
 
-app.use("/favicon.ico", express.static("src/images/favicon.ico"));
+app.use("/favicon.ico", express.static("public/favicon.ico"));
 
 app.use(bodyParser.json());
 

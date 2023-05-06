@@ -15,7 +15,7 @@ dotenv_1.default.config();
 mongodb_1.default.connect();
 redis_1.redisClient.connect();
 const app = (0, express_1.default)();
-app.use("/favicon.ico", express_1.default.static("src/images/favicon.ico"));
+app.use("/favicon.ico", express_1.default.static("public/favicon.ico"));
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use((0, morgan_1.default)("dev"));
