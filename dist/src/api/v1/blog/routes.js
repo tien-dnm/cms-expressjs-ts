@@ -14,3 +14,4 @@ router.post("", middleware_1.default, controllers_1.createBlog);
 router.patch("/:id", middleware_1.default, controllers_1.updateBlog);
 router.delete("/:id", middleware_1.default, controllers_1.deleteBlog);
 exports.default = router;
+//# sourceMappingURL=routes.js.map

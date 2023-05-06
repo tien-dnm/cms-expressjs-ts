@@ -12,3 +12,4 @@ router.use("/auth", routes_1.default);
 router.use("/user", routes_2.default);
 router.use("/blog", routes_3.default);
 exports.default = router;
+//# sourceMappingURL=routes.js.map

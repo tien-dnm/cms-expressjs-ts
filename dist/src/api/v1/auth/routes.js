@@ -9,3 +9,4 @@ const router = express_1.default.Router();
 router.post("/access-token", controllers_1.accessToken);
 router.post("/refresh-token", controllers_1.refreshToken);
 exports.default = router;
+//# sourceMappingURL=routes.js.map

@@ -18,3 +18,4 @@ redisClient.on("error", () => {
     console.error.bind(console, `Redis connection error: ${process.env.REDIS_URL}`);
     // redisClient.connect();
 });
+//# sourceMappingURL=redis.js.map

@@ -14,3 +14,4 @@ router.post("", middleware_1.default, controllers_1.createUser);
 router.patch("/:id", middleware_1.default, controllers_1.updateUser);
 router.delete("/:id", middleware_1.default, controllers_1.deleteUser);
 exports.default = router;
+//# sourceMappingURL=routes.js.map

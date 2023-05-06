@@ -70,3 +70,4 @@ const verifyPassword = (user, password) => {
     }
 };
 exports.verifyPassword = verifyPassword;
+//# sourceMappingURL=methods.js.map

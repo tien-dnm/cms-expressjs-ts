@@ -24,3 +24,4 @@ connection.once("open", () => {
     console.log("MongoDB connected");
 });
 exports.default = mongodb;
+//# sourceMappingURL=mongodb.js.map

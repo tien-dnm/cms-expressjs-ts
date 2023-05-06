@@ -31,3 +31,4 @@ const refreshTokenSchema = new mongoose_1.Schema({
 });
 const RefreshToken = (0, mongoose_1.model)("RefreshToken", refreshTokenSchema, "refresh_token");
 exports.default = RefreshToken;
+//# sourceMappingURL=model.js.map

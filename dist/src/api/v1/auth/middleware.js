@@ -28,3 +28,4 @@ const isAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
     return next();
 });
 exports.default = isAuth;
+//# sourceMappingURL=middleware.js.map
