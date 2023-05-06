@@ -17,6 +17,8 @@ redisClient.connect();
 
 const app = express();
 
+app.use("/favicon.ico", express.static("src/images/favicon.ico"));
+
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -26,7 +28,7 @@ app.use(logger("dev"));
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("Hello world");
+  res.json(["HELLO WORLD"]);
 });
 
 app.use("/v1", v1Router);
