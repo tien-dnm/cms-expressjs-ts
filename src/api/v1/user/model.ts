@@ -77,7 +77,7 @@ const userSchema = new Schema<IUser>({
   },
   created_by: {
     type: Schema.Types.ObjectId,
-    required: true,
+    required: false,
     ref: "User",
   },
   modified_date: {
@@ -86,7 +86,7 @@ const userSchema = new Schema<IUser>({
   },
   modified_by: {
     type: Schema.Types.ObjectId,
-    required: true,
+    required: false,
     ref: "User",
   },
   is_deleted: {
@@ -101,7 +101,7 @@ const userSchema = new Schema<IUser>({
   },
   deleted_by: {
     type: Schema.Types.ObjectId,
-    required: true,
+    required: false,
     ref: "User",
     default: null,
   },

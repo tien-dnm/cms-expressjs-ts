@@ -57,7 +57,7 @@ const userSchema = new mongoose_1.Schema({
     },
     created_by: {
         type: mongoose_1.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         ref: "User",
     },
     modified_date: {
@@ -66,7 +66,7 @@ const userSchema = new mongoose_1.Schema({
     },
     modified_by: {
         type: mongoose_1.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         ref: "User",
     },
     is_deleted: {
@@ -81,7 +81,7 @@ const userSchema = new mongoose_1.Schema({
     },
     deleted_by: {
         type: mongoose_1.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         ref: "User",
         default: null,
     },
