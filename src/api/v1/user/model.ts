@@ -1,27 +1,6 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model, InferSchemaType } from "mongoose";
 
-export interface IUser {
-  _id: Types.ObjectId;
-  username: string;
-  password_hash: string;
-  password_salt: string;
-  email: string;
-  email_confirmed: boolean;
-  phone_number: string;
-  phone_number_confirmed: boolean;
-  access_failed_count: number;
-  locked_out: boolean;
-  locked_out_end: Date;
-  created_date: Date;
-  created_by: Types.ObjectId;
-  modified_date: Date;
-  modified_by: Types.ObjectId;
-  is_deleted: boolean;
-  deleted_date: Date;
-  deleted_by: Types.ObjectId;
-}
-
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema({
   _id: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -106,5 +85,9 @@ const userSchema = new Schema<IUser>({
     default: null,
   },
 });
-const User = model<IUser>("User", userSchema, "user");
+
+export type User = InferSchemaType<typeof userSchema>;
+
+const User = model<User>("User", userSchema, "user");
+
 export default User;

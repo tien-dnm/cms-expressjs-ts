@@ -7,11 +7,11 @@ const express_1 = __importDefault(require("express"));
 const controllers_1 = require("./controllers");
 const middleware_1 = __importDefault(require("../auth/middleware"));
 const router = express_1.default.Router();
-router.get("", controllers_1.getAllBlogs);
-router.get("/filter", controllers_1.filterBlogs);
-router.get("/:id", controllers_1.getBlogById);
-router.post("", middleware_1.default, controllers_1.createBlog);
-router.patch("/:id", middleware_1.default, controllers_1.updateBlog);
-router.delete("/:id", middleware_1.default, controllers_1.deleteBlog);
+router.get("", controllers_1.getAllPosts);
+router.get("/filter", controllers_1.filterPosts);
+router.get("/:id", controllers_1.getPostById);
+router.post("", controllers_1.createPost);
+router.patch("/:id", middleware_1.default, controllers_1.updatePost);
+router.delete("/:id", middleware_1.default, controllers_1.deletePost);
 exports.default = router;
 //# sourceMappingURL=routes.js.map

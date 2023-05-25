@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
-const blogSchema = new mongoose_1.Schema({
+const postSchema = new mongoose_1.Schema({
     _id: {
         type: mongoose_1.Schema.Types.ObjectId,
         required: true,
@@ -63,5 +63,5 @@ const blogSchema = new mongoose_1.Schema({
         default: null,
     },
 });
-exports.default = (0, mongoose_1.model)("Blog", blogSchema, "blog");
+exports.default = (0, mongoose_1.model)("Post", postSchema, "post");
 //# sourceMappingURL=model.js.map

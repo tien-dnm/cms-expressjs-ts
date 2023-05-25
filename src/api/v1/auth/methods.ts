@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import moment from "moment";
 import crypto from "crypto";
-import { IUser } from "../user/model";
+import { User } from "../user/model";
 
 export const generateToken = async (payload: unknown) => {
   try {
@@ -41,7 +41,7 @@ export const decodeToken = async (token: string) => {
   }
 };
 
-export const verifyPassword = (user: IUser, password: string) => {
+export const verifyPassword = (user: User, password: string) => {
   try {
     const { password_hash, password_salt } = user;
     const checkPassword = crypto

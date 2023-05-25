@@ -1,22 +1,6 @@
-import { Types, Schema, model } from "mongoose";
+import { Schema, model, InferSchemaType } from "mongoose";
 
-export interface IBlog {
-  _id: Types.ObjectId;
-  title: string;
-  sub_title: string;
-  content: string;
-  author: string;
-  publish_date: Date;
-  created_date: Date;
-  created_by: Types.ObjectId;
-  modified_date: Date;
-  modified_by: Types.ObjectId;
-  is_deleted: boolean;
-  deleted_date: Date;
-  deleted_by: Types.ObjectId;
-}
-
-const blogSchema = new Schema<IBlog>({
+const postSchema = new Schema({
   _id: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -79,4 +63,6 @@ const blogSchema = new Schema<IBlog>({
   },
 });
 
-export default model<IBlog>("Blog", blogSchema, "blog");
+export type Post = InferSchemaType<typeof postSchema>;
+
+export default model<Post>("Post", postSchema, "post");

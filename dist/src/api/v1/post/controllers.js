@@ -12,17 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBlog = exports.updateBlog = exports.createBlog = exports.getBlogById = exports.filterBlogs = exports.getAllBlogs = void 0;
+exports.deletePost = exports.updatePost = exports.createPost = exports.getPostById = exports.filterPosts = exports.getAllPosts = void 0;
 const model_1 = __importDefault(require("./model"));
 // ==================================================================
-const getAllBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const blog = yield model_1.default.find({
+        const post = yield model_1.default.find({
             is_deleted: {
                 $ne: true,
             },
         });
-        res.json(blog);
+        res.json(post);
     }
     catch (error) {
         if (error instanceof Error) {
@@ -30,9 +30,9 @@ const getAllBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }
 });
-exports.getAllBlogs = getAllBlogs;
+exports.getAllPosts = getAllPosts;
 // ==================================================================
-const filterBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const filterPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const removeItems = ["page", "size"];
         const { page, size } = req.query;
@@ -43,11 +43,11 @@ const filterBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         removeItems.forEach((item) => delete cloneQuery[item]);
         const jsonStringQuery = JSON.stringify(cloneQuery).replace(/\b(eq|ne|gt|gte|lt|lte|regex)\b/g, (key) => `$${key}`);
         const actualQuery = JSON.parse(jsonStringQuery);
-        const blogs = yield model_1.default.find(actualQuery, "", {
+        const posts = yield model_1.default.find(actualQuery, "", {
             skip,
             _size,
         });
-        res.json(blogs);
+        res.json(posts);
     }
     catch (error) {
         if (error instanceof Error) {
@@ -55,17 +55,17 @@ const filterBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }
 });
-exports.filterBlogs = filterBlogs;
+exports.filterPosts = filterPosts;
 // ==================================================================
-const getBlogById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getPostById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const blog = yield model_1.default.findById(id, "");
-        if (blog) {
-            res.json(blog);
+        const post = yield model_1.default.findById(id, "");
+        if (post) {
+            res.json(post);
         }
         else {
-            res.status(400).send("Blog not found");
+            res.status(400).send("Post not found");
         }
     }
     catch (error) {
@@ -74,25 +74,25 @@ const getBlogById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         }
     }
 });
-exports.getBlogById = getBlogById;
+exports.getPostById = getPostById;
 // ==================================================================
-const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { title, sub_title, content, author, publish_date } = req.body;
         if (!title || !sub_title || !content) {
             res.status(400).send("Invalid Request");
         }
-        const blog = yield model_1.default.create({
+        const post = yield model_1.default.create({
             title,
             sub_title,
             content,
             author,
             publish_date,
         });
-        const queryBlog = yield model_1.default.findById(
+        const queryPost = yield model_1.default.findById(
         // eslint-disable-next-line no-underscore-dangle
-        blog._id);
-        return res.status(201).json(queryBlog);
+        post._id);
+        return res.status(201).json(queryPost);
     }
     catch (error) {
         if (error instanceof Error) {
@@ -100,17 +100,17 @@ const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
 });
-exports.createBlog = createBlog;
+exports.createPost = createPost;
 // ==================================================================
-const updateBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const blog = yield model_1.default.findById(id, "");
-        if (!blog) {
-            res.status(400).send("Blog not found");
+        const post = yield model_1.default.findById(id, "");
+        if (!post) {
+            res.status(400).send("Post not found");
         }
         const { content, title, sub_title, author, publish_date } = req.body;
-        const updatedBlog = yield model_1.default.findByIdAndUpdate(id, {
+        const updatedPost = yield model_1.default.findByIdAndUpdate(id, {
             content,
             title,
             sub_title,
@@ -122,7 +122,7 @@ const updateBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             new: true,
             upsert: false,
         });
-        return res.status(200).json(updatedBlog);
+        return res.status(200).json(updatedPost);
     }
     catch (error) {
         if (error instanceof Error) {
@@ -130,14 +130,14 @@ const updateBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
 });
-exports.updateBlog = updateBlog;
+exports.updatePost = updatePost;
 // ==================================================================
-const deleteBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const blog = yield model_1.default.findById(id, "");
-        if (!blog) {
-            res.status(400).send("Blog not found");
+        const post = yield model_1.default.findById(id, "");
+        if (!post) {
+            res.status(400).send("Post not found");
         }
         yield model_1.default.findByIdAndUpdate(id, {
             is_deleted: true,
@@ -156,5 +156,5 @@ const deleteBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }
 });
-exports.deleteBlog = deleteBlog;
+exports.deletePost = deletePost;
 //# sourceMappingURL=controllers.js.map

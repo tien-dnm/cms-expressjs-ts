@@ -1,15 +1,6 @@
-import { Types, Schema, model } from "mongoose";
+import { Schema, model, InferSchemaType } from "mongoose";
 
-export interface IRefreshToken {
-  _id: Types.ObjectId;
-  user_id: Types.ObjectId;
-  token: string;
-  is_revoked: boolean;
-  expires: Date;
-  is_used: boolean;
-}
-
-const refreshTokenSchema = new Schema<IRefreshToken>({
+const refreshTokenSchema = new Schema({
   _id: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -37,7 +28,10 @@ const refreshTokenSchema = new Schema<IRefreshToken>({
     required: false,
   },
 });
-const RefreshToken = model<IRefreshToken>(
+
+export type RefreshToken = InferSchemaType<typeof refreshTokenSchema>;
+
+const RefreshToken = model<RefreshToken>(
   "RefreshToken",
   refreshTokenSchema,
   "refresh_token"

@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import Blog from "./model";
+import Post from "./model";
 
 // ==================================================================
-export const getAllBlogs = async (req: Request, res: Response) => {
+export const getAllPosts = async (req: Request, res: Response) => {
   try {
-    const blog = await Blog.find({
+    const post = await Post.find({
       is_deleted: {
         $ne: true,
       },
     });
 
-    res.json(blog);
+    res.json(post);
   } catch (error: unknown) {
     if (error instanceof Error) {
       return res.status(400).send(error.message);
@@ -18,7 +18,7 @@ export const getAllBlogs = async (req: Request, res: Response) => {
   }
 };
 // ==================================================================
-export const filterBlogs = async (req: Request, res: Response) => {
+export const filterPosts = async (req: Request, res: Response) => {
   try {
     const removeItems = ["page", "size"];
 
@@ -40,12 +40,12 @@ export const filterBlogs = async (req: Request, res: Response) => {
     );
     const actualQuery = JSON.parse(jsonStringQuery);
 
-    const blogs = await Blog.find(actualQuery, "", {
+    const posts = await Post.find(actualQuery, "", {
       skip,
       _size,
     });
 
-    res.json(blogs);
+    res.json(posts);
   } catch (error: unknown) {
     if (error instanceof Error) {
       return res.status(400).send(error.message);
@@ -53,16 +53,16 @@ export const filterBlogs = async (req: Request, res: Response) => {
   }
 };
 // ==================================================================
-export const getBlogById = async (req: Request, res: Response) => {
+export const getPostById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const blog = await Blog.findById(id, "");
+    const post = await Post.findById(id, "");
 
-    if (blog) {
-      res.json(blog);
+    if (post) {
+      res.json(post);
     } else {
-      res.status(400).send("Blog not found");
+      res.status(400).send("Post not found");
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -71,25 +71,25 @@ export const getBlogById = async (req: Request, res: Response) => {
   }
 };
 // ==================================================================
-export const createBlog = async (req: Request, res: Response) => {
+export const createPost = async (req: Request, res: Response) => {
   try {
     const { title, sub_title, content, author, publish_date } = req.body;
     if (!title || !sub_title || !content) {
       res.status(400).send("Invalid Request");
     }
 
-    const blog = await Blog.create({
+    const post = await Post.create({
       title,
       sub_title,
       content,
       author,
       publish_date,
     });
-    const queryBlog = await Blog.findById(
+    const queryPost = await Post.findById(
       // eslint-disable-next-line no-underscore-dangle
-      blog._id
+      post._id
     );
-    return res.status(201).json(queryBlog);
+    return res.status(201).json(queryPost);
   } catch (error: unknown) {
     if (error instanceof Error) {
       return res.status(400).send(error.message);
@@ -97,19 +97,19 @@ export const createBlog = async (req: Request, res: Response) => {
   }
 };
 // ==================================================================
-export const updateBlog = async (req: Request, res: Response) => {
+export const updatePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const blog = await Blog.findById(id, "");
+    const post = await Post.findById(id, "");
 
-    if (!blog) {
-      res.status(400).send("Blog not found");
+    if (!post) {
+      res.status(400).send("Post not found");
     }
 
     const { content, title, sub_title, author, publish_date } = req.body;
 
-    const updatedBlog = await Blog.findByIdAndUpdate(
+    const updatedPost = await Post.findByIdAndUpdate(
       id,
       {
         content,
@@ -126,7 +126,7 @@ export const updateBlog = async (req: Request, res: Response) => {
       }
     );
 
-    return res.status(200).json(updatedBlog);
+    return res.status(200).json(updatedPost);
   } catch (error: unknown) {
     if (error instanceof Error) {
       return res.status(400).send(error.message);
@@ -134,17 +134,17 @@ export const updateBlog = async (req: Request, res: Response) => {
   }
 };
 // ==================================================================
-export const deleteBlog = async (req: Request, res: Response) => {
+export const deletePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const blog = await Blog.findById(id, "");
+    const post = await Post.findById(id, "");
 
-    if (!blog) {
-      res.status(400).send("Blog not found");
+    if (!post) {
+      res.status(400).send("Post not found");
     }
 
-    await Blog.findByIdAndUpdate(
+    await Post.findByIdAndUpdate(
       id,
       {
         is_deleted: true,
