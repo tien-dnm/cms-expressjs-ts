@@ -2,6 +2,45 @@ import { Request, Response } from "express";
 import Post from "./model";
 
 // ==================================================================
+export const countAllPosts = async (req: Request, res: Response) => {
+  try {
+    const count = await Post.find({
+      is_deleted: {
+        $ne: true,
+      },
+    }).count();
+
+    res.json({ count });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(400).send(error.message);
+    }
+  }
+};
+export const filterThenCountPosts = async (req: Request, res: Response) => {
+  try {
+    const removeItems = ["page", "size"];
+
+    const cloneQuery = { ...req.query };
+
+    removeItems.forEach((item) => delete cloneQuery[item]);
+
+    const jsonStringQuery = JSON.stringify(cloneQuery).replace(
+      /\b(eq|ne|gt|gte|lt|lte|regex)\b/g,
+      (key) => `$${key}`
+    );
+    const actualQuery = JSON.parse(jsonStringQuery);
+
+    const count = await Post.find(actualQuery, "").count();
+
+    res.json({ count });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(400).send(error.message);
+    }
+  }
+};
+// ==================================================================
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
     const post = await Post.find({
@@ -28,8 +67,8 @@ export const filterPosts = async (req: Request, res: Response) => {
 
     const _page = +(page ?? 0);
 
-    const skip = _size >= 1 ? (_page > 1 ? _page - 1 : 0 * _size) : 0;
-
+    const skip = _size >= 1 ? (_page > 1 ? (_page - 1) * _size : 0) : 0;
+    console.log(skip);
     const cloneQuery = { ...req.query };
 
     removeItems.forEach((item) => delete cloneQuery[item]);
@@ -42,7 +81,7 @@ export const filterPosts = async (req: Request, res: Response) => {
 
     const posts = await Post.find(actualQuery, "", {
       skip,
-      _size,
+      limit: _size,
     });
 
     res.json(posts);

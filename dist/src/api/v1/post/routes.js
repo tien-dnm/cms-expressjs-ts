@@ -8,6 +8,8 @@ const controllers_1 = require("./controllers");
 const middleware_1 = __importDefault(require("../auth/middleware"));
 const router = express_1.default.Router();
 router.get("", controllers_1.getAllPosts);
+router.get("/count", controllers_1.countAllPosts);
+router.get("/filter/count", controllers_1.filterThenCountPosts);
 router.get("/filter", controllers_1.filterPosts);
 router.get("/:id", controllers_1.getPostById);
 router.post("", controllers_1.createPost);

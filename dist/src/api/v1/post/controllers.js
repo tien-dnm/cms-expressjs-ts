@@ -12,8 +12,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePost = exports.updatePost = exports.createPost = exports.getPostById = exports.filterPosts = exports.getAllPosts = void 0;
+exports.deletePost = exports.updatePost = exports.createPost = exports.getPostById = exports.filterPosts = exports.getAllPosts = exports.filterThenCountPosts = exports.countAllPosts = void 0;
 const model_1 = __importDefault(require("./model"));
+// ==================================================================
+const countAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const count = yield model_1.default.find({
+            is_deleted: {
+                $ne: true,
+            },
+        }).count();
+        res.json({ count });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return res.status(400).send(error.message);
+        }
+    }
+});
+exports.countAllPosts = countAllPosts;
+const filterThenCountPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const removeItems = ["page", "size"];
+        const cloneQuery = Object.assign({}, req.query);
+        removeItems.forEach((item) => delete cloneQuery[item]);
+        const jsonStringQuery = JSON.stringify(cloneQuery).replace(/\b(eq|ne|gt|gte|lt|lte|regex)\b/g, (key) => `$${key}`);
+        const actualQuery = JSON.parse(jsonStringQuery);
+        const count = yield model_1.default.find(actualQuery, "").count();
+        res.json({ count });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return res.status(400).send(error.message);
+        }
+    }
+});
+exports.filterThenCountPosts = filterThenCountPosts;
 // ==================================================================
 const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -38,14 +72,15 @@ const filterPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const { page, size } = req.query;
         const _size = +(size !== null && size !== void 0 ? size : 0);
         const _page = +(page !== null && page !== void 0 ? page : 0);
-        const skip = _size >= 1 ? (_page > 1 ? _page - 1 : 0 * _size) : 0;
+        const skip = _size >= 1 ? (_page > 1 ? (_page - 1) * _size : 0) : 0;
+        console.log(skip);
         const cloneQuery = Object.assign({}, req.query);
         removeItems.forEach((item) => delete cloneQuery[item]);
         const jsonStringQuery = JSON.stringify(cloneQuery).replace(/\b(eq|ne|gt|gte|lt|lte|regex)\b/g, (key) => `$${key}`);
         const actualQuery = JSON.parse(jsonStringQuery);
         const posts = yield model_1.default.find(actualQuery, "", {
             skip,
-            _size,
+            limit: _size,
         });
         res.json(posts);
     }
