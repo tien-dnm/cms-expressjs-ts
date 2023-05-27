@@ -7,6 +7,10 @@ const postSchema = new mongoose_1.Schema({
         required: true,
         auto: true,
     },
+    thumbnail_link: {
+        type: String,
+        required: false,
+    },
     title: {
         type: String,
         required: true,
@@ -22,6 +26,11 @@ const postSchema = new mongoose_1.Schema({
     author: {
         type: String,
         required: false,
+    },
+    slug: {
+        type: String,
+        required: true,
+        unique: true,
     },
     publish_date: {
         type: Date,
@@ -62,6 +71,13 @@ const postSchema = new mongoose_1.Schema({
         ref: "User",
         default: null,
     },
+});
+postSchema.index({
+    "title": "text",
+    "sub_title": "text",
+    "content": "text",
+    "author": "text",
+    "slug": "text",
 });
 exports.default = (0, mongoose_1.model)("Post", postSchema, "post");
 //# sourceMappingURL=model.js.map

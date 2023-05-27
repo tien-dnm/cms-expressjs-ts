@@ -6,6 +6,10 @@ const postSchema = new Schema({
     required: true,
     auto: true,
   },
+  thumbnail_link: {
+    type: String,
+    required: false,
+  },
   title: {
     type: String,
     required: true,
@@ -21,6 +25,11 @@ const postSchema = new Schema({
   author: {
     type: String,
     required: false,
+  },
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
   },
   publish_date: {
     type: Date,
@@ -61,6 +70,14 @@ const postSchema = new Schema({
     ref: "User",
     default: null,
   },
+});
+
+postSchema.index({
+  "title": "text",
+  "sub_title": "text",
+  "content": "text",
+  "author": "text",
+  "slug": "text",
 });
 
 export type Post = InferSchemaType<typeof postSchema>;

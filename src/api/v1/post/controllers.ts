@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import Post from "./model";
+import { Post, default as PostSchema } from "./model";
 
 // ==================================================================
 export const countAllPosts = async (req: Request, res: Response) => {
   try {
-    const count = await Post.find({
+    const count = await PostSchema.find({
       is_deleted: {
         $ne: true,
       },
@@ -19,19 +19,24 @@ export const countAllPosts = async (req: Request, res: Response) => {
 };
 export const filterThenCountPosts = async (req: Request, res: Response) => {
   try {
-    const removeItems = ["page", "size"];
-
+    const removeItems = ["page", "size", "sort", "search"];
+    const { search } = req.query;
     const cloneQuery = { ...req.query };
 
     removeItems.forEach((item) => delete cloneQuery[item]);
 
     const jsonStringQuery = JSON.stringify(cloneQuery).replace(
-      /\b(eq|ne|gt|gte|lt|lte|regex)\b/g,
+      /\b(eq|ne|gt|gte|lt|lte|regex|search)\b/g,
       (key) => `$${key}`
     );
-    const actualQuery = JSON.parse(jsonStringQuery);
 
-    const count = await Post.find(actualQuery, "").count();
+    const actualQuery = JSON.parse(jsonStringQuery);
+    if (search) {
+      actualQuery["$text"] = {
+        "$search": `${search}`,
+      };
+    }
+    const count = await PostSchema.find(actualQuery, "").count();
 
     res.json({ count });
   } catch (error: unknown) {
@@ -43,7 +48,7 @@ export const filterThenCountPosts = async (req: Request, res: Response) => {
 // ==================================================================
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
-    const post = await Post.find({
+    const post = await PostSchema.find({
       is_deleted: {
         $ne: true,
       },
@@ -59,16 +64,16 @@ export const getAllPosts = async (req: Request, res: Response) => {
 // ==================================================================
 export const filterPosts = async (req: Request, res: Response) => {
   try {
-    const removeItems = ["page", "size"];
+    const removeItems = ["page", "size", "sort", "search"];
 
-    const { page, size } = req.query;
+    const { page, size, sort, search } = req.query;
 
     const _size = +(size ?? 0);
 
     const _page = +(page ?? 0);
 
     const skip = _size >= 1 ? (_page > 1 ? (_page - 1) * _size : 0) : 0;
-    console.log(skip);
+
     const cloneQuery = { ...req.query };
 
     removeItems.forEach((item) => delete cloneQuery[item]);
@@ -79,14 +84,31 @@ export const filterPosts = async (req: Request, res: Response) => {
     );
     const actualQuery = JSON.parse(jsonStringQuery);
 
-    const posts = await Post.find(actualQuery, "", {
+    if (search) {
+      actualQuery["$text"] = {
+        "$search": `${search}`,
+      };
+    }
+
+    const sortFields = sort ? (sort as string).split(",") : ["publish_date"]; // Default sorting field is 'name'
+    const sortOrders = sortFields.map((field) => (field.startsWith("-") ? -1 : 1)); // -1 for descending, 1 for ascending
+    const sortKeys = sortFields.map((field) => field.replace(/^-/, "")); // Remove '-' sign if present
+    // Build the sorting object
+
+    const sortObj = {} as { [key: string]: number };
+    sortKeys.forEach((key, index) => {
+      sortObj[key] = sortOrders[index];
+    });
+    const posts = await PostSchema.find(actualQuery, "", {
       skip,
       limit: _size,
+      sort: sortObj,
     });
 
     res.json(posts);
   } catch (error: unknown) {
     if (error instanceof Error) {
+      console.log(error.message);
       return res.status(400).send(error.message);
     }
   }
@@ -96,7 +118,7 @@ export const getPostById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const post = await Post.findById(id, "");
+    const post = await PostSchema.findById(id, "");
 
     if (post) {
       res.json(post);
@@ -112,19 +134,22 @@ export const getPostById = async (req: Request, res: Response) => {
 // ==================================================================
 export const createPost = async (req: Request, res: Response) => {
   try {
-    const { title, sub_title, content, author, publish_date } = req.body;
+    const { title, sub_title, content, author, publish_date, thumbnail_link, slug } =
+      req.body;
     if (!title || !sub_title || !content) {
       res.status(400).send("Invalid Request");
     }
 
-    const post = await Post.create({
+    const post = await PostSchema.create({
       title,
       sub_title,
       content,
       author,
       publish_date,
+      thumbnail_link,
+      slug,
     });
-    const queryPost = await Post.findById(
+    const queryPost = await PostSchema.findById(
       // eslint-disable-next-line no-underscore-dangle
       post._id
     );
@@ -139,16 +164,16 @@ export const createPost = async (req: Request, res: Response) => {
 export const updatePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-
-    const post = await Post.findById(id, "");
+    const post = await PostSchema.findById(id);
 
     if (!post) {
       res.status(400).send("Post not found");
     }
 
-    const { content, title, sub_title, author, publish_date } = req.body;
+    const { content, title, sub_title, author, publish_date, slug, thumbnail_link } =
+      req.body as Post;
 
-    const updatedPost = await Post.findByIdAndUpdate(
+    const updatedPost = await PostSchema.findByIdAndUpdate(
       id,
       {
         content,
@@ -157,7 +182,9 @@ export const updatePost = async (req: Request, res: Response) => {
         author,
         publish_date,
         modified_date: new Date(),
-        modified_by: "",
+        // modified_by: "",
+        slug,
+        thumbnail_link,
       },
       {
         new: true,
@@ -177,13 +204,13 @@ export const deletePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const post = await Post.findById(id, "");
+    const post = await PostSchema.findById(id, "");
 
     if (!post) {
       res.status(400).send("Post not found");
     }
 
-    await Post.findByIdAndUpdate(
+    await PostSchema.findByIdAndUpdate(
       id,
       {
         is_deleted: true,
