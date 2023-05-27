@@ -139,7 +139,6 @@ export const createPost = async (req: Request, res: Response) => {
     if (!title || !sub_title || !content) {
       res.status(400).send("Invalid Request");
     }
-
     const post = await PostSchema.create({
       title,
       sub_title,
