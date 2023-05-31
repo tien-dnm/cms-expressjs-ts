@@ -15,7 +15,7 @@ const postSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
-    sub_title: {
+    description: {
         type: String,
         required: false,
     },
@@ -74,7 +74,7 @@ const postSchema = new mongoose_1.Schema({
 });
 postSchema.index({
     "title": "text",
-    "sub_title": "text",
+    "description": "text",
     "content": "text",
     "author": "text",
     "slug": "text",

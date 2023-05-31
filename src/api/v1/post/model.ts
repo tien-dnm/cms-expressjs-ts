@@ -14,7 +14,7 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-  sub_title: {
+  description: {
     type: String,
     required: false,
   },
@@ -74,7 +74,7 @@ const postSchema = new Schema({
 
 postSchema.index({
   "title": "text",
-  "sub_title": "text",
+  "description": "text",
   "content": "text",
   "author": "text",
   "slug": "text",

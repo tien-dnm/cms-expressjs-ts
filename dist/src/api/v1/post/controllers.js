@@ -44,7 +44,9 @@ const filterThenCountPosts = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 "$search": `${search}`,
             };
         }
-        const count = yield model_1.default.find(actualQuery, "").count();
+        const count = yield model_1.default.find(Object.assign({ is_deleted: {
+                $ne: true,
+            } }, actualQuery)).count();
         res.json({ count });
     }
     catch (error) {
@@ -89,14 +91,16 @@ const filterPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             };
         }
         const sortFields = sort ? sort.split(",") : ["publish_date"]; // Default sorting field is 'name'
-        const sortOrders = sortFields.map((field) => (field.startsWith("-") ? -1 : 1)); // -1 for descending, 1 for ascending
+        const sortOrders = sortFields.map((field) => field.startsWith("-") ? -1 : 1); // -1 for descending, 1 for ascending
         const sortKeys = sortFields.map((field) => field.replace(/^-/, "")); // Remove '-' sign if present
         // Build the sorting object
         const sortObj = {};
         sortKeys.forEach((key, index) => {
             sortObj[key] = sortOrders[index];
         });
-        const posts = yield model_1.default.find(actualQuery, "", {
+        const posts = yield model_1.default.find(Object.assign({ is_deleted: {
+                $ne: true,
+            } }, actualQuery), "", {
             skip,
             limit: _size,
             sort: sortObj,
@@ -133,13 +137,13 @@ exports.getPostById = getPostById;
 // ==================================================================
 const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, sub_title, content, author, publish_date, thumbnail_link, slug } = req.body;
-        if (!title || !sub_title || !content) {
+        const { title, description, content, author, publish_date, thumbnail_link, slug, } = req.body;
+        if (!title || !description || !content) {
             res.status(400).send("Invalid Request");
         }
         const post = yield model_1.default.create({
             title,
-            sub_title,
+            description,
             content,
             author,
             publish_date,
@@ -166,11 +170,11 @@ const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (!post) {
             res.status(400).send("Post not found");
         }
-        const { content, title, sub_title, author, publish_date, slug, thumbnail_link } = req.body;
+        const { content, title, description, author, publish_date, slug, thumbnail_link, } = req.body;
         const updatedPost = yield model_1.default.findByIdAndUpdate(id, {
             content,
             title,
-            sub_title,
+            description,
             author,
             publish_date,
             modified_date: new Date(),
@@ -194,14 +198,15 @@ exports.updatePost = updatePost;
 const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const post = yield model_1.default.findById(id, "");
+        const post = yield model_1.default.findById(id);
+        console.log(post);
         if (!post) {
             res.status(400).send("Post not found");
         }
         yield model_1.default.findByIdAndUpdate(id, {
             is_deleted: true,
             deleted_date: new Date(),
-            deleted_by: "",
+            // deleted_by: "",
         }, {
             new: true,
             upsert: false,

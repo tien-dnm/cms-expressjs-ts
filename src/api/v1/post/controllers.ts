@@ -36,7 +36,12 @@ export const filterThenCountPosts = async (req: Request, res: Response) => {
         "$search": `${search}`,
       };
     }
-    const count = await PostSchema.find(actualQuery, "").count();
+    const count = await PostSchema.find({
+      is_deleted: {
+        $ne: true,
+      },
+      ...actualQuery,
+    }).count();
 
     res.json({ count });
   } catch (error: unknown) {
@@ -91,7 +96,9 @@ export const filterPosts = async (req: Request, res: Response) => {
     }
 
     const sortFields = sort ? (sort as string).split(",") : ["publish_date"]; // Default sorting field is 'name'
-    const sortOrders = sortFields.map((field) => (field.startsWith("-") ? -1 : 1)); // -1 for descending, 1 for ascending
+    const sortOrders = sortFields.map((field) =>
+      field.startsWith("-") ? -1 : 1
+    ); // -1 for descending, 1 for ascending
     const sortKeys = sortFields.map((field) => field.replace(/^-/, "")); // Remove '-' sign if present
     // Build the sorting object
 
@@ -99,11 +106,20 @@ export const filterPosts = async (req: Request, res: Response) => {
     sortKeys.forEach((key, index) => {
       sortObj[key] = sortOrders[index];
     });
-    const posts = await PostSchema.find(actualQuery, "", {
-      skip,
-      limit: _size,
-      sort: sortObj,
-    });
+    const posts = await PostSchema.find(
+      {
+        is_deleted: {
+          $ne: true,
+        },
+        ...actualQuery,
+      },
+      "",
+      {
+        skip,
+        limit: _size,
+        sort: sortObj,
+      }
+    );
 
     res.json(posts);
   } catch (error: unknown) {
@@ -134,14 +150,21 @@ export const getPostById = async (req: Request, res: Response) => {
 // ==================================================================
 export const createPost = async (req: Request, res: Response) => {
   try {
-    const { title, sub_title, content, author, publish_date, thumbnail_link, slug } =
-      req.body;
-    if (!title || !sub_title || !content) {
+    const {
+      title,
+      description,
+      content,
+      author,
+      publish_date,
+      thumbnail_link,
+      slug,
+    } = req.body;
+    if (!title || !description || !content) {
       res.status(400).send("Invalid Request");
     }
     const post = await PostSchema.create({
       title,
-      sub_title,
+      description,
       content,
       author,
       publish_date,
@@ -169,15 +192,22 @@ export const updatePost = async (req: Request, res: Response) => {
       res.status(400).send("Post not found");
     }
 
-    const { content, title, sub_title, author, publish_date, slug, thumbnail_link } =
-      req.body as Post;
+    const {
+      content,
+      title,
+      description,
+      author,
+      publish_date,
+      slug,
+      thumbnail_link,
+    } = req.body as Post;
 
     const updatedPost = await PostSchema.findByIdAndUpdate(
       id,
       {
         content,
         title,
-        sub_title,
+        description,
         author,
         publish_date,
         modified_date: new Date(),
@@ -203,8 +233,8 @@ export const deletePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const post = await PostSchema.findById(id, "");
-
+    const post = await PostSchema.findById(id);
+    console.log(post);
     if (!post) {
       res.status(400).send("Post not found");
     }
@@ -214,7 +244,7 @@ export const deletePost = async (req: Request, res: Response) => {
       {
         is_deleted: true,
         deleted_date: new Date(),
-        deleted_by: "",
+        // deleted_by: "",
       },
       {
         new: true,
